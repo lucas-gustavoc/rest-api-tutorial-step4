@@ -8,6 +8,8 @@ const app = express()
 */
 const wishesRouter = require('./controller/wishes')
 
+const authenticationRouter = require('./controller/authentication')
+
 // Already covered in part 1
 const port = 3000
 
@@ -23,6 +25,8 @@ app.use(express.json())
     file controller/wishes.js. See that file for more details.
 */
 app.use(wishesRouter)
+
+app.use(authenticationRouter)
 
 // Already covered in part 1
 app.get('/', (req, res) => {
