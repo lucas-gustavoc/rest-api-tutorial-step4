@@ -1,17 +1,22 @@
 const Wish = require('./Wish')
 
 test('validate with valid input', () => {
-    const wish = { wish: 'to pass the test', priority: 'high' }
+    const wish = { wish: 'to pass the test', priority: 'high', userId: '1' }
     expect(Wish.validate(wish)).toBeTruthy()
 })
 
 test('invalidate without wish description', () => {
-    const wish = { priority: 'low' }
+    const wish = { priority: 'low', userId: '1' }
     expect(Wish.validate(wish)).toBeFalsy()
 })
 
 test('invalidate without priority', () => {
-    const wish = { wish: 'to be invalid' }
+    const wish = { wish: 'to be invalid', userId: '1' }
+    expect(Wish.validate(wish)).toBeFalsy()
+})
+
+test('invalidate without userId', () => {
+    const wish = { wish: 'to be invalid', priority: 'low' }
     expect(Wish.validate(wish)).toBeFalsy()
 })
 
@@ -21,8 +26,8 @@ test('get all wishes', () => {
 
     // Mocking
     const wishList = [
-        { wish: 'something', priority: 'normal', id: 1 },
-        { wish: 'something else', priority: 'high', id: 2 }
+        { wish: 'something', priority: 'normal', id: 1, userId: '1' },
+        { wish: 'something else', priority: 'high', id: 2, userId: '1' }
     ]
     Wish.wishes = wishList
 
@@ -39,8 +44,8 @@ test('get one wish by id', () => {
 
     // Mocking
     const wishId = 1
-    const wish = { wish: 'to be valid', priority: 'high', id: wishId }
-    Wish.wishes = [{wish: 'not', priority: 'high', id: 2}, wish]
+    const wish = { wish: 'to be valid', priority: 'high', id: wishId, userId: '1' }
+    Wish.wishes = [{wish: 'not', priority: 'high', id: 2, userId: '1'}, wish]
 
     // Testing
     expect(Wish.getOne(wishId)).toBe(wish)
@@ -55,7 +60,7 @@ test('fail getting one wish by a nonexistent id', () => {
 })
 
 test('create a new wish', () => {
-    const wish = { wish: 'to be created', priority: 'high' }
+    const wish = { wish: 'to be created', priority: 'high', userId: '1' }
     const createdWishId = Wish.create(wish).id
     const createdWish = Wish.getOne(createdWishId)
 
@@ -73,7 +78,7 @@ test('update a wish description by id', () => {
 
     // Mocking
     const wishToUpdateId = 1
-    Wish.wishes = [{ wish: 'to be updated', priority: 'high', id: wishToUpdateId }]
+    Wish.wishes = [{ wish: 'to be updated', priority: 'high', id: wishToUpdateId, userId: '1' }]
 
     // Testing
     const newWishDescription = 'already updated'
@@ -90,7 +95,7 @@ test('update a wish priority by id', () => {
 
     // Mocking
     const wishToUpdateId = 1
-    Wish.wishes = [{ wish: 'to be updated', priority: 'high', id: wishToUpdateId }]
+    Wish.wishes = [{ wish: 'to be updated', priority: 'high', id: wishToUpdateId, userId: '1' }]
 
     // Testing
     const newWishPriority = 'low'
@@ -107,7 +112,7 @@ test('delete wish by id', () => {
 
     // Mocking
     const wishToDeleteId = 1
-    Wish.wishes = [{ wish: 'to be deleted', priority: 'low', id: wishToDeleteId }]
+    Wish.wishes = [{ wish: 'to be deleted', priority: 'low', id: wishToDeleteId, userId: '1' }]
 
     // Testing
     expect(Wish.getOne(wishToDeleteId)).toBeDefined()

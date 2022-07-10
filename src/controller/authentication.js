@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../model/User')
 const jwt = require('jsonwebtoken')
+const auth = require('../middleware/auth')
 
 router.post('/register', (req, res) => {
     try {
@@ -36,11 +37,11 @@ router.post('/login', (req, res) => {
                 const token = jwt.sign(
                     { name: user.name, email: user.email },
                     'BIGSECRET',
-                    { expiresIn: '2h'}
-                    )
-                user.token = token
-                delete user.password
-                res.status(200).send(user)
+                    { expiresIn: '2h'})
+                
+                const userDataToReturn = { ...user, token }
+                delete userDataToReturn.password
+                res.status(200).send(userDataToReturn)
             } else {
                 res.status(400).send({ message: 'Invalid email/password.'})
             }
@@ -50,6 +51,10 @@ router.post('/login', (req, res) => {
     } catch(err) {
         res.status(500).send({ message: err.message })
     }
+})
+
+router.get('/welcome', auth, (req, res) => {
+    res.status(200).send({ message: `Welcome ${req.user.name}!`})
 })
 
 module.exports = router

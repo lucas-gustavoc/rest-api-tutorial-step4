@@ -17,7 +17,7 @@ const auth = require('../middleware/auth')
 // It expects JSON data and return the created register.
 router.post('/wishes', auth, (req, res) => {
     try {
-        const nWish = Wish.create(req.body)
+        const nWish = Wish.create({...req.body, userId: req.user.id})
         if (nWish) {
             res.status(201).send(nWish)
         } else {
@@ -32,7 +32,7 @@ router.post('/wishes', auth, (req, res) => {
 // It does not expect any data and return all the wishes list
 router.get('/wishes', auth, (req, res) => {
     try {
-        res.status(200).send(Wish.getAll())
+        res.status(200).send(Wish.getAllOfOneUser(req.user.id))
     } catch(err) {
         res.status(500).send({ message: err.message })
     }
@@ -43,7 +43,7 @@ router.get('/wishes', auth, (req, res) => {
 router.get('/wishes/:id', auth, (req, res) => {
     try {
         const foundWish = Wish.getOne(req.params.id)
-        if (foundWish) {
+        if (foundWish && foundWish.userId == req.user.id) {
             res.status(200).send(foundWish)
         } else {
             res.status(404).send({ message: 'Wish not found!'})
@@ -57,11 +57,13 @@ router.get('/wishes/:id', auth, (req, res) => {
 // It expects JSON data and the wish ID on the URL, and return the updated register
 router.patch('/wishes/:id', auth, (req, res) => {
     try {
-        const updatedWish = Wish.patch(req.params.id, req.body)
-        if (updatedWish) {
+        const wish = Wish.getOne(req.params.id)
+        if (!wish) return res.status(404).send({ message: 'Wish not found!' })
+        if (wish.userId == req.user.id) {
+            const updatedWish = Wish.patch(req.params.id, req.body)
             res.status(200).send(updatedWish)
         } else {
-            res.status(404).send({ message: 'Wish not found!' })
+            res.status(403).send({ message: 'This user has no access to this resource.'})
         }
     } catch(err) {
         res.status(500).send({ message: err.message })
@@ -72,12 +74,15 @@ router.patch('/wishes/:id', auth, (req, res) => {
 // It expects just the wish ID on the URL, and returns a message about the deletion
 router.delete('/wishes/:id', auth, (req, res) => {
     try {
-        const deleteMessage = Wish.delete(req.params.id)
-        if (deleteMessage) {
+        const wish = Wish.getOne(req.params.id)
+        if (!wish) return res.status(404).send({ message: 'Wish not found!' })
+        if (wish.userId == req.user.id) {
+            const deleteMessage = Wish.delete(req.params.id)
             res.status(200).send(deleteMessage)
         } else {
-            res.status(404).send({ message: 'Wish not found!' })
+            res.status(403).send({ message: 'This user has no access to this resource.'})
         }
+        
     } catch(err) {
         res.status(500).send({ message: err.message })
     }

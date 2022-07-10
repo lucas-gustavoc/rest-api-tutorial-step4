@@ -17,7 +17,12 @@ class Wish {
     static create(wish) {
         if (Wish.validate(wish)) {
             wish.id = uniqid()
-            Wish.wishes.push({ id: wish.id, wish: wish.wish, priority: wish.priority })
+            Wish.wishes.push({ 
+                id: wish.id, 
+                wish: wish.wish, 
+                priority: wish.priority, 
+                userId: wish.userId 
+            })
             return wish
         } else {
             return undefined
@@ -29,6 +34,7 @@ class Wish {
         let valid = true
         if (!wish.wish) valid = false
         if (!wish.priority) valid = false
+        if (!wish.userId) valid = false
         return valid
     }
 
@@ -41,6 +47,10 @@ class Wish {
     static getOne(id) {
         const wish = Wish.wishes.find(item => item.id == id)
         return wish
+    }
+
+    static getAllOfOneUser(userId) {
+        return Wish.wishes.filter(item => item.userId == userId)
     }
 
     // tested
