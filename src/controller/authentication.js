@@ -3,6 +3,7 @@ const router = new express.Router()
 const User = require('../model/User')
 const jwt = require('jsonwebtoken')
 const auth = require('../middleware/auth')
+require('dotenv').config()
 
 router.post('/register', (req, res) => {
     try {
@@ -36,7 +37,7 @@ router.post('/login', (req, res) => {
             if (user && User.comparePassword(password, user.password)) {
                 const token = jwt.sign(
                     { name: user.name, email: user.email },
-                    'BIGSECRET',
+                    process.env.JWT_KEY,
                     { expiresIn: '2h'})
                 
                 const userDataToReturn = { ...user, token }

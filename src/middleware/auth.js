@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken')
 const User = require('../model/User')
+require('dotenv').config()
 
 const auth = (req, res, next) => {
     const token = req.body.token || req.query.token || (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1])
 
     if (token) {
         try {
-            const userData = jwt.verify(token, 'BIGSECRET')
+            const userData = jwt.verify(token, process.env.JWT_KEY)
             const user = userData.email && User.getOneByEmail(userData.email)
             
             if (user) {

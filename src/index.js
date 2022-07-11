@@ -1,6 +1,7 @@
 // Already covered in part 1
 const express = require('express')
 const app = express()
+require('dotenv').config()
 
 /*
     Here we are just importing the router we've created at the
@@ -11,7 +12,7 @@ const wishesRouter = require('./controller/wishes')
 const authenticationRouter = require('./controller/authentication')
 
 // Already covered in part 1
-const port = 3000
+const port = process.env.DEFAULT_PORT
 
 /*
     This statement makes express understand and parse JSON data
