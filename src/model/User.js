@@ -1,11 +1,16 @@
-/*
-    This is the import of the tool we will be using to
-    fake IDs for our registers.
-*/
+// Already covered in part 2
 const uniqid = require('uniqid')
 
+/*
+    This is the library used to validate the email address
+    in the user registration process.
+*/
 const validator = require('validator')
 
+/*
+    This is the library responsible for encrypting the password
+    provided by the user in the registration process.
+*/
 const bcrypt = require('bcrypt')
 
 /*
@@ -49,6 +54,7 @@ class User {
         return user
     }
 
+    // tested
     static comparePassword(password, hashPassword) {
         return bcrypt.compareSync(password, hashPassword)
     }

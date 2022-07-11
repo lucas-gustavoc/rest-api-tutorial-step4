@@ -2,6 +2,13 @@ const jwt = require('jsonwebtoken')
 const User = require('../model/User')
 require('dotenv').config()
 
+/*
+    This is the middleware used to verify if the requester is authenticated
+    or not. Note that, if so, the next() method is called, which makes the
+    request to continue as desired by the API consumer. If not, the request
+    response is sent right here, and nothing more in the API is executed till
+    a new request is done.
+*/
 const auth = (req, res, next) => {
     const token = req.body.token || req.query.token || (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1])
 

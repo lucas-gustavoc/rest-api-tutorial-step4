@@ -5,6 +5,10 @@ const jwt = require('jsonwebtoken')
 const auth = require('../middleware/auth')
 require('dotenv').config()
 
+/**
+ * This is the request used to register a new user. See the API Reference
+ * in the README.md to understand how it works.
+ */
 router.post('/register', (req, res) => {
     try {
         const existingUser = User.getOneByEmail(req.body.email)
@@ -29,6 +33,10 @@ router.post('/register', (req, res) => {
     }
 })
 
+/**
+ * This is the request used to log an user in. See the API Reference
+ * in the README.md to understand how it works.
+ */
 router.post('/login', (req, res) => {
     try {
         const { email, password } = req.body
@@ -54,6 +62,10 @@ router.post('/login', (req, res) => {
     }
 })
 
+/**
+ * This is the request used to test if an user is logged in. See the API Reference
+ * in the README.md to understand how it works.
+ */
 router.get('/welcome', auth, (req, res) => {
     res.status(200).send({ message: `Welcome ${req.user.name}!`})
 })
