@@ -9,16 +9,17 @@ require('dotenv').config()
  * This is the request used to register a new user. See the API Reference
  * in the README.md to understand how it works.
  */
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
     try {
-        const existingUser = User.getOneByEmail(req.body.email)
+        const existingUser = await User.getOneByEmail(req.body.email)
         if (!existingUser) {
-            const nUser = User.create({
+            const nUserId = await User.create({
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password
             })
-            if (nUser) {
+            if (nUserId) {
+                const nUser = await User.getOneByEmail(req.body.email)
                 delete nUser.password
                 res.status(201).send(nUser)
             } else {

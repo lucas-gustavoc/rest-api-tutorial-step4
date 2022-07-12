@@ -1,6 +1,10 @@
 // Already covered in part 2
 const uniqid = require('uniqid')
 
+const knex = require('knex')
+const config = require('../../knexfile')
+const db = knex(config.development)
+
 /*
     This is the library used to validate the email address
     in the user registration process.
@@ -23,17 +27,10 @@ class User {
     static users = []
 
     // tested
-    static create(user) {
+    static async create(user) {
         if (User.validate(user)) {
-            user.id = uniqid()
             user.password = bcrypt.hashSync(user.password, 10)
-            User.users.push({ 
-                id: user.id, 
-                name: user.name, 
-                email: user.email,
-                password: user.password
-            })
-            return user
+            return await db('users').insert(user)
         } else {
             return undefined
         }
@@ -49,8 +46,9 @@ class User {
     }
 
     // tested
-    static getOneByEmail(email) {
-        const user = User.users.find(item => item.email == email)
+    static async getOneByEmail(email) {
+        const user = await db('users').where({email})
+        if (!user) return undefined
         return user
     }
 
