@@ -9,13 +9,13 @@ require('dotenv').config()
     response is sent right here, and nothing more in the API is executed till
     a new request is done.
 */
-const auth = (req, res, next) => {
+const auth = async (req, res, next) => {
     const token = req.body.token || req.query.token || (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1])
 
     if (token) {
         try {
             const userData = jwt.verify(token, process.env.JWT_KEY)
-            const user = userData.email && User.getOneByEmail(userData.email)
+            const user = userData.email && await User.getOneByEmail(userData.email)
             
             if (user) {
                 req.user = user

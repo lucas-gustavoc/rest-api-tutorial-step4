@@ -1,8 +1,10 @@
-/*
-    This is the import of the tool we will be using to
-    fake IDs for our registers.
-*/
-const uniqid = require('uniqid')
+// Already covered in part 2 - This module will not be used anymore,
+// once the database already creates an unique id for each new register
+// const uniqid = require('uniqid')
+
+const knex = require('knex')
+const config = require('../../knexfile')
+const db = knex(config.development)
 
 /*
     This is a basic JavaScript class which handles our
@@ -11,18 +13,13 @@ const uniqid = require('uniqid')
 */
 class Wish {
 
-    static wishes = []
-
     // tested
-    static create(wish) {
+    static async create(wish) {
         if (Wish.validate(wish)) {
-            wish.id = uniqid()
-            Wish.wishes.push({ 
-                id: wish.id, 
-                wish: wish.wish, 
-                priority: wish.priority, 
-                userId: wish.userId 
-            })
+            wish.user_id = wish.userId
+            delete wish.userId
+            const id = await db('wishes').insert(wish)
+            wish.id = id[0]
             return wish
         } else {
             return undefined
@@ -39,44 +36,47 @@ class Wish {
     }
 
     // tested
-    static getAll() {
-        return Wish.wishes
+    static async getAll() {
+        return await db.select().table('wishes')
     }
 
     // tested
-    static getOne(id) {
-        const wish = Wish.wishes.find(item => item.id == id)
-        return wish
+    static async getOne(id) {
+        const wish = await db('wishes').where({id})
+        
+        /**
+         * In case of wish not found, knex returns an empty array.
+         * Otherwise, it returns an array with just one item inside,
+         * which would be the wish we're looking for.
+         */
+         if (wish.length === 0) return undefined
+         return wish[0]
     }
 
-    static getAllOfOneUser(userId) {
-        return Wish.wishes.filter(item => item.userId == userId)
-    }
-
-    // tested
-    static patch(id, patches) {
-        const wishToPatch = Wish.getOne(id)
-        if (wishToPatch) {
-            if (patches.wish) wishToPatch.wish = patches.wish
-            if (patches.priority) wishToPatch.priority = patches.priority
-            
-            const wishIndex = Wish.wishes.findIndex(item => item.id == id)
-            Wish.wishes[wishIndex] = wishToPatch
-            return wishToPatch
-        } else {
-            return undefined
-        }
+    static async getAllOfOneUser(userId) {
+        return await db('wishes').where({ user_id: userId })
     }
 
     // tested
-    static delete(id) {
-        const wishIndex = Wish.wishes.findIndex(item => item.id == id)
-        if (wishIndex > -1) {
-            Wish.wishes.splice(wishIndex, 1)
-            return { message: 'Wish deleted successfully!' }
-        } else {
-            return undefined
-        }
+    static async patch(id, patches) {
+        const wishToPatch = {}
+
+        if (patches.wish) wishToPatch.wish = patches.wish
+        if (patches.priority) wishToPatch.priority = patches.priority
+        
+        const patch = await db('wishes').where({id}).update(wishToPatch, ['id', 'wish', 'priority'])
+        
+        if (patch > 0) return { message: 'Wish updated successfully!'}
+        return undefined
+
+    }
+
+    // tested
+    static async delete(id) {
+        const deletion = await db('wishes').where({id}).del()
+        
+        if (deletion > 0) return { message: 'Wish deleted successfully!' }
+        return undefined
     }
 }
 

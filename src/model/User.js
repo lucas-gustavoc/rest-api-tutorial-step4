@@ -1,5 +1,6 @@
-// Already covered in part 2
-const uniqid = require('uniqid')
+// Already covered in part 2 - This module will not be used anymore,
+// once the database already creates an unique id for each new register
+// const uniqid = require('uniqid')
 
 const knex = require('knex')
 const config = require('../../knexfile')
@@ -48,8 +49,14 @@ class User {
     // tested
     static async getOneByEmail(email) {
         const user = await db('users').where({email})
-        if (!user) return undefined
-        return user
+        
+        /**
+         * In case of user not found, knex returns an empty array.
+         * Otherwise, it returns an array with just one item inside,
+         * which would be the user we're looking for.
+         */
+        if (user.length === 0) return undefined
+        return user[0]
     }
 
     // tested

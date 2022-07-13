@@ -38,11 +38,11 @@ router.post('/register', async (req, res) => {
  * This is the request used to log an user in. See the API Reference
  * in the README.md to understand how it works.
  */
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body
         if (email && password) {
-            const user = User.getOneByEmail(email)
+            const user = await User.getOneByEmail(email)
             if (user && User.comparePassword(password, user.password)) {
                 const token = jwt.sign(
                     { name: user.name, email: user.email },
